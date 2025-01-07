@@ -29,8 +29,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="w-full max-w-sm p-8 rounded-lg shadow-lg m-3 py-20">
+    <div className="flex justify-center items-center h-[100dvh]">
+      <div className="w-full max-w-sm px-8 rounded-lg shadow-lg m-5 py-20">
         <h2 className="text-center text-2xl font-semibold mb-10">
           ورود به حساب
         </h2>

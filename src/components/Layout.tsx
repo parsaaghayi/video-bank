@@ -6,8 +6,10 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="flex justify-center w-full h-[100vh]" style={{direction:"rtl"}}>
-      <main className=" w-[400px] max-w-[100vw] bg-[#f8f8f8] h-full">{children}</main>
+    <div className="flex justify-center" style={{ direction: "rtl" }}>
+      <main className="w-[400px] max-w-[100dvw] bg-[#f8f8f8] h-[100dvh]">
+        {children}
+      </main>
     </div>
   );
 }
