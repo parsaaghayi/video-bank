@@ -1,5 +1,6 @@
 import {
   ControlBar,
+  DisconnectButton,
   GridLayout,
   LiveKitRoom,
   ParticipantTile,
@@ -77,6 +78,9 @@ const VideoBank = () => {
             {/* Controls for the user to start/stop audio, video, and screen
       share tracks and to leave the room. */}
             <ControlBar />
+            {/* <div className="flex w-full p-2 justify-center items-center">
+              <button type="button" className="text-red-600 border-red-600 border-2 p-2 rounded">خروج از جلسه</button>
+            </div> */}
           </LiveKitRoom>
         ) : null}
       </div>
