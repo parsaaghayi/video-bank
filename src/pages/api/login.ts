@@ -39,7 +39,7 @@ export default async function loginHandler(
       secure: false, // Ensure secure flag is true only in production
       maxAge: 60 * 60 * 24 * 7, // Token expiry in 1 week
       path: "/",
-      sameSite: "lax",
+      // sameSite: "lax",
     });
 
     const cookie2 = serialize("username", req.body.username, {
@@ -47,7 +47,7 @@ export default async function loginHandler(
       secure: false, // Ensure secure flag is true only in production
       maxAge: 60 * 60 * 24 * 7, // Token expiry in 1 week
       path: "/",
-      sameSite: "lax",
+      // sameSite: "lax",
     });
 
     const cookie3 = serialize("role", req.body.role, {
@@ -55,7 +55,7 @@ export default async function loginHandler(
       secure: false, // Ensure secure flag is true only in production
       maxAge: 60 * 60 * 24 * 7, // Token expiry in 1 week
       path: "/",
-      sameSite: "lax",
+      // sameSite: "lax",
     });
 
     const cookie4 = serialize("videoToken", "", {
@@ -63,7 +63,7 @@ export default async function loginHandler(
       secure: false, // برای محیط تولید باید secure=true باشد
       maxAge: -1, // زمان کوکی‌ها را به تاریخ منقضی شده تنظیم می‌کند
       path: "/",
-      sameSite: "strict",
+      // sameSite: "strict",
     });
 
     const cookie5 = serialize("roomUrl", "", {
@@ -71,7 +71,7 @@ export default async function loginHandler(
       secure: false, // برای محیط تولید باید secure=true باشد
       maxAge: -1, // زمان کوکی‌ها را به تاریخ منقضی شده تنظیم می‌کند
       path: "/",
-      sameSite: "strict",
+      // sameSite: "strict",
     });
 
     const cookie6 = serialize("isLogin", "true", {
