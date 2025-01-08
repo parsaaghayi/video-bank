@@ -92,6 +92,7 @@ export default async function loginHandler(
   } catch (error: any) {
     console.log("error:", error);
     console.log("status:", error.response?.status); // مشاهده کد وضعیت
+    console.log("Error config:", error.config); // مشاهده تنظیمات درخواست
     let response = error.response?.data || { message: "An error occurred" };
     res.status(error.response?.status || 500).json({ response });
   }
