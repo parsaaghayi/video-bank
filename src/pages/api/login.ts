@@ -80,7 +80,8 @@ export default async function loginHandler(
     res.status(200).json({ success: true, role: req.body.role });
   } catch (error: any) {
     console.log("error:", error);
-
+    console.log("davood");
+    
     let response = error.response?.data || { message: "An error occurred" };
     res.status(error.response?.status || 500).json({ response });
   }
