@@ -36,7 +36,7 @@ export default async function loginHandler(
     // Set cookies for token and login status
     const cookie1 = serialize("token", response.token, {
       httpOnly: false,
-      secure: process.env.NODE_ENV === "production", // Ensure secure flag is true only in production
+      secure: false, // Ensure secure flag is true only in production
       maxAge: 60 * 60 * 24 * 7, // Token expiry in 1 week
       path: "/",
       sameSite: "lax",
@@ -44,7 +44,7 @@ export default async function loginHandler(
 
     const cookie2 = serialize("username", req.body.username, {
       httpOnly: false,
-      secure: process.env.NODE_ENV === "production", // Ensure secure flag is true only in production
+      secure: false, // Ensure secure flag is true only in production
       maxAge: 60 * 60 * 24 * 7, // Token expiry in 1 week
       path: "/",
       sameSite: "lax",
@@ -52,7 +52,7 @@ export default async function loginHandler(
 
     const cookie3 = serialize("role", req.body.role, {
       httpOnly: false,
-      secure: process.env.NODE_ENV === "production", // Ensure secure flag is true only in production
+      secure: false, // Ensure secure flag is true only in production
       maxAge: 60 * 60 * 24 * 7, // Token expiry in 1 week
       path: "/",
       sameSite: "lax",
