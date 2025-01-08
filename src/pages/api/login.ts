@@ -15,6 +15,10 @@ export default async function loginHandler(
     return res.status(400).json({ message: "Invalid request body" });
   }
 
+  res.setHeader("Access-Control-Allow-Origin", "*"); // یا به جای '*' دامنه مشخص
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
   const config = {
     method: "post",
     url: Axios_Route.login,
@@ -76,12 +80,18 @@ export default async function loginHandler(
     });
 
     // Set cookies in the response header
-    res.setHeader("Set-Cookie", [cookie1, cookie2, cookie3, cookie4, cookie5, cookie6]);
+    res.setHeader("Set-Cookie", [
+      cookie1,
+      cookie2,
+      cookie3,
+      cookie4,
+      cookie5,
+      cookie6,
+    ]);
     res.status(200).json({ success: true, role: req.body.role });
   } catch (error: any) {
     console.log("error:", error);
-    console.log("davood");
-    
+
     let response = error.response?.data || { message: "An error occurred" };
     res.status(error.response?.status || 500).json({ response });
   }
