@@ -365,58 +365,40 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let initialLength: number | null = null;
   let initialVideoToken: string | null = null;
   let initialRoomUrl: string | null = null;
-
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/getQueuePosition`,
-      {
-        headers: {
-          Authorization: `Bearer ${Token}`,
-        },
-        withCredentials: true, // برای ارسال کوکی‌ها
-      }
-    );
-
-    if (response.status === 200) {
-      const data = response.data;
-      console.log(data);
-
-      initialPosition = data.position
-        ? data.position !== null
-          ? data.position
-          : 1
-        : null; // اگر position null باشد مقدار 1 می‌شود
-      initialLength = data.queueLength
-        ? data.queueLength !== null
-          ? data.queueLength
-          : 1
-        : null; // اگر queueLength null باشد مقدار 1 می‌شود
-      initialVideoToken = data.userToken
-        ? data.userToken !== null
-          ? data.userToken
-          : null
-        : null; // اگر position null باشد مقدار 1 می‌شود
-      initialRoomUrl = data.roomUrl
-        ? data.roomUrl !== null
-          ? data.roomUrl
-          : null
-        : null; // اگر position null باشد مقدار 1 می‌شود
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/getQueuePosition`,
+    {
+      headers: {
+        Authorization: `Bearer ${Token}`,
+      },
+      withCredentials: true, // برای ارسال کوکی‌ها
     }
-  } catch (error: any) {
-    // بررسی اینکه آیا پاسخ از سمت سرور وجود دارد
-    if (error.response) {
-      // if (error.response.status === 403) {
-      //   redirect("/logout");
-      // }
-      console.error(
-        "api/getQueuePosition Server responded with an error:",
-        error.response.data
-      );
+  );
 
-      initialLength = error.response.data.error.queueLength
-        ? error.response.data.error.queueLength
-        : null;
-    }
+  if (response.status === 200) {
+    const data = response.data;
+    console.log(data);
+
+    initialPosition = data.position
+      ? data.position !== null
+        ? data.position
+        : 1
+      : null; // اگر position null باشد مقدار 1 می‌شود
+    initialLength = data.queueLength
+      ? data.queueLength !== null
+        ? data.queueLength
+        : 1
+      : null; // اگر queueLength null باشد مقدار 1 می‌شود
+    initialVideoToken = data.userToken
+      ? data.userToken !== null
+        ? data.userToken
+        : null
+      : null; // اگر position null باشد مقدار 1 می‌شود
+    initialRoomUrl = data.roomUrl
+      ? data.roomUrl !== null
+        ? data.roomUrl
+        : null
+      : null; // اگر position null باشد مقدار 1 می‌شود
   }
 
   return {
