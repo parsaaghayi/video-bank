@@ -405,9 +405,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } catch (error: any) {
     // بررسی اینکه آیا پاسخ از سمت سرور وجود دارد
     if (error.response) {
-      if (error.response.status === 403) {
-        redirect("/logout");
-      }
+      // if (error.response.status === 403) {
+      //   redirect("/logout");
+      // }
       console.error(
         "api/getQueuePosition Server responded with an error:",
         error.response.data
