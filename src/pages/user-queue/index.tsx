@@ -1,11 +1,12 @@
-import { GetServerSideProps } from "next";
-import Image from "next/image";
-import { redirect, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { parseCookies } from "nookies";
-import { notify, ToastType } from "@/utils/toast";
-import axios from "axios";
+import { GetServerSideProps } from "next"; // For server-side data fetching
+import Image from "next/image"; // For optimized image rendering
+import { redirect, useRouter } from "next/navigation"; // For navigation and redirects
+import React, { useEffect, useState } from "react"; // React core and hooks
+import { parseCookies } from "nookies"; // Utility to handle cookies on both client and server
+import { notify, ToastType } from "@/utils/toast"; // Notification utility
+import axios from "axios"; // HTTP client for API requests
 
+// Component to manage user queue functionality
 const UserQueue = ({
   initialPosition,
   initialLength,
@@ -17,125 +18,94 @@ const UserQueue = ({
   initialVideoToken: string | null;
   initialRoomUrl: string | null;
 }) => {
-  const [userRole, setUserRole] = useState("");
-  const [addToQueueloading, setAddToQueueloading] = useState(false);
-  const [nextUserLoading, setNextUserLoading] = useState(false);
+  // State management
+  const [userRole, setUserRole] = useState(""); // User's role (e.g., user or operator)
+  const [addToQueueloading, setAddToQueueloading] = useState(false); // Loading state for adding to queue
+  const [nextUserLoading, setNextUserLoading] = useState(false); // Loading state for fetching the next user
+  const [removeFromQueueloading, setRemoveFromQueueloading] = useState(false); // Loading state for removing from queue
+  const [queuePosition, setQueuePosition] = useState<number | null>(initialPosition); // Current position in queue
+  const [queueLength, setQueueLength] = useState<number | null>(initialLength); // Total length of the queue
+  const [videoToken, setVideoToken] = useState<string | null>(initialVideoToken); // Token for video conference
+  const [roomUrl, setRoomUrl] = useState<string | null>(initialRoomUrl); // URL for the video conference room
+  const [step, setStep] = useState(initialPosition !== null ? 2 : 1); // Step in the queue process
+  const router = useRouter(); // Next.js router for navigation
 
-  const [removeFromQueueloading, setRemoveFromQueueloading] = useState(false);
-  const [queuePosition, setQueuePosition] = useState<number | null>(
-    initialPosition
-  );
-  const [queueLength, setQueueLength] = useState<number | null>(initialLength);
-  const [videoToken, setVideoToken] = useState<string | null>(
-    initialVideoToken
-  );
-  const [roomUrl, setRoomUrl] = useState<string | null>(initialRoomUrl);
-  const [step, setStep] = useState(initialPosition !== null ? 2 : 1);
-  const router = useRouter();
-
+  // Effect: Retrieve user role from cookies
   useEffect(() => {
     const getCookie = (name: string): string | null => {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
-      return null;
+      return parts.length === 2 ? parts.pop()?.split(";").shift() || null : null;
     };
-    let userRoleCookie = getCookie("role");
+
+    const userRoleCookie = getCookie("role");
     if (userRoleCookie) {
       setUserRole(userRoleCookie);
     }
   }, []);
 
+  // Effect: Periodically fetch queue position based on role
   useEffect(() => {
-    if (userRole === "user") {
-      if (step !== 2) return; // اگر step برابر با 2 نباشد، به درخواست‌ها ادامه نده
-      const interval = setInterval(async () => {
-        getPosition();
-      }, 5000); // ۵ ثانیه یک بار
+    const interval = setInterval(() => {
+      getPosition();
+    }, 5000); // Fetch every 5 seconds
 
-      return () => clearInterval(interval); // پاک کردن تایمر در هنگام تغییر وضعیت
-    } else if (userRole === "operator") {
-      const interval = setInterval(async () => {
-        getPosition();
-      }, 5000); // ۵ ثانیه یک بار
-
-      return () => clearInterval(interval);
-    }
+    return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [step, userRole]);
 
+  // Effect: Update step and set cookies when videoToken changes
   useEffect(() => {
     if (videoToken !== null) {
       setStep(3);
-    }
 
-    if (videoToken !== null) {
-      const cookieValue1 = `videoToken=${videoToken}; Path=/; Secure; SameSite=Strict; Expires=${new Date(
-        Date.now() + 7 * 24 * 60 * 60 * 1000 // تنظیم انقضا به 7 روز
+      // Set cookies for videoToken and roomUrl
+      document.cookie = `videoToken=${videoToken}; Path=/; Secure; SameSite=Strict; Expires=${new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
       ).toUTCString()}`;
-      document.cookie = cookieValue1;
-      const cookieValue2 = `roomUrl=${roomUrl}; Path=/; Secure; SameSite=Strict; Expires=${new Date(
-        Date.now() + 7 * 24 * 60 * 60 * 1000 // تنظیم انقضا به 7 روز
+
+      document.cookie = `roomUrl=${roomUrl}; Path=/; Secure; SameSite=Strict; Expires=${new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
       ).toUTCString()}`;
-      document.cookie = cookieValue2;
     }
   }, [videoToken]);
 
+  // Function: Fetch queue position and details from API
   const getPosition = async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/getQueuePosition`,
-        {
-          withCredentials: true, // برای ارسال کوکی‌ها
-        }
+        { withCredentials: true } // Include cookies in request
       );
 
       if (response.status === 200) {
         const data = response.data;
-
-        setQueuePosition(data.position ? data.position : null); // موقعیت صف
-        setQueueLength(data.queueLength ? data.queueLength : null);
-        setVideoToken(data.userToken ? data.userToken : null);
-        setRoomUrl(data.roomUrl ? data.roomUrl : null);
-        // اگر کاربر از صف خارج شد
-        // if (data.status === "completed" || data.status === "error") {
-        //   router.push("/logout");
-        // }
+        setQueuePosition(data.position || null);
+        setQueueLength(data.queueLength || null);
+        setVideoToken(data.userToken || null);
+        setRoomUrl(data.roomUrl || null);
       }
     } catch (error: any) {
       if (error.response) {
-        setQueueLength(
-          error.response.data.error.queueLength
-            ? error.response.data.error.queueLength
-            : null
-        );
+        setQueueLength(error.response.data.error.queueLength || null);
       }
     }
   };
 
+  // Function: Add user to the queue
   const handleAddUserToQueue = async () => {
     setAddToQueueloading(true);
     try {
       const response = await fetch("/api/addUserToQueue", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // ارسال کوکی
-        body: JSON.stringify({}),
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       });
 
       if (response.status === 401 || response.status === 403) {
-        notify(
-          "برای استفاده از این قابلیت باید وارد حساب کاربری شوید.",
-          ToastType.error
-        );
+        notify("برای استفاده از این قابلیت باید وارد حساب کاربری شوید.", ToastType.error);
         router.push("/logout");
         return;
       }
-
-      // if (!response.ok) {
-      //   throw new Error(`Error: ${response.status}`);
-      // }
 
       const data = await response.json();
       getPosition();
@@ -149,26 +119,18 @@ const UserQueue = ({
     }
   };
 
+  // Function: Remove user from the queue
   const handleRemoveUserFromQueue = async () => {
-    setRemoveFromQueueloading(true); // نمایش لودر
-
+    setRemoveFromQueueloading(true);
     try {
       const response = await fetch("/api/removeUserFromQueue", {
-        method: "DELETE", // استفاده از متد DELETE
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // ارسال کوکی
-        body: JSON.stringify({}), // می‌توانید داده‌های مورد نیاز را اینجا ارسال کنید (اگر نیاز باشد)
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       });
 
       if (response.status === 401) {
-        // مدیریت خطای 401
-        notify(
-          "برای استفاده از این قابلیت باید وارد حساب کاربری شوید.",
-          ToastType.error
-        );
-        // هدایت کاربر به صفحه ورود
+        notify("برای استفاده از این قابلیت باید وارد حساب کاربری شوید.", ToastType.error);
         router.push("/logout");
         return;
       }
@@ -177,7 +139,6 @@ const UserQueue = ({
         throw new Error(`Error: ${response.status}`);
       }
 
-      const data = await response.json();
       notify("کاربر با موفقیت از صف حذف شد.", ToastType.success);
       setStep(1);
       setQueuePosition(null);
@@ -188,20 +149,22 @@ const UserQueue = ({
       console.error("Error removing user from queue:", error);
       notify("خطایی در حذف کاربر از صف رخ داد.", ToastType.error);
     } finally {
-      setRemoveFromQueueloading(false); // خاموش کردن لودر
+      setRemoveFromQueueloading(false);
     }
   };
 
+  // Function: Redirect to video conference
   const handleCallConference = async () => {
     router.push("video-bank");
   };
 
+  // Function: Fetch details for the next user in the queue
   const handleNextUser = async () => {
     setNextUserLoading(true);
     try {
       const response = await fetch("/api/getNextQueue", {
         method: "GET",
-        credentials: "include", // ارسال کوکی‌ها
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -209,24 +172,26 @@ const UserQueue = ({
       }
 
       const data = await response.json();
-      setVideoToken(data.operatorToken ? data.operatorToken : null);
-      setRoomUrl(data.roomUrl ? data.roomUrl : null);
+      setVideoToken(data.operatorToken || null);
+      setRoomUrl(data.roomUrl || null);
 
+      // Set cookies if videoToken exists
       if (videoToken !== null) {
-        const cookieValue1 = `videoToken=${videoToken}; Path=/; Secure; SameSite=Strict; Expires=${new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000 // تنظیم انقضا به 7 روز
+        document.cookie = `videoToken=${videoToken}; Path=/; Secure; SameSite=Strict; Expires=${new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000
         ).toUTCString()}`;
-        document.cookie = cookieValue1;
-        const cookieValue2 = `roomUrl=${roomUrl}; Path=/; Secure; SameSite=Strict; Expires=${new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000 // تنظیم انقضا به 7 روز
+
+        document.cookie = `roomUrl=${roomUrl}; Path=/; Secure; SameSite=Strict; Expires=${new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000
         ).toUTCString()}`;
-        document.cookie = cookieValue2;
       }
+
       router.push("video-bank");
     } catch (error) {
       console.error("Error fetching queue position:", error);
+    } finally {
+      setNextUserLoading(false);
     }
-    setNextUserLoading(false);
   };
 
   return (
