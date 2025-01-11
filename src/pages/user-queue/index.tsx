@@ -23,13 +23,9 @@ const UserQueue = ({
   const [addToQueueloading, setAddToQueueloading] = useState(false); // Loading state for adding to queue
   const [nextUserLoading, setNextUserLoading] = useState(false); // Loading state for fetching the next user
   const [removeFromQueueloading, setRemoveFromQueueloading] = useState(false); // Loading state for removing from queue
-  const [queuePosition, setQueuePosition] = useState<number | null>(
-    initialPosition
-  ); // Current position in queue
+  const [queuePosition, setQueuePosition] = useState<number | null>(initialPosition); // Current position in queue
   const [queueLength, setQueueLength] = useState<number | null>(initialLength); // Total length of the queue
-  const [videoToken, setVideoToken] = useState<string | null>(
-    initialVideoToken
-  ); // Token for video conference
+  const [videoToken, setVideoToken] = useState<string | null>(initialVideoToken); // Token for video conference
   const [roomUrl, setRoomUrl] = useState<string | null>(initialRoomUrl); // URL for the video conference room
   const [step, setStep] = useState(initialPosition !== null ? 2 : 1); // Step in the queue process
   const router = useRouter(); // Next.js router for navigation
@@ -39,9 +35,7 @@ const UserQueue = ({
     const getCookie = (name: string): string | null => {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
-      return parts.length === 2
-        ? parts.pop()?.split(";").shift() || null
-        : null;
+      return parts.length === 2 ? parts.pop()?.split(";").shift() || null : null;
     };
 
     const userRoleCookie = getCookie("role");
@@ -108,10 +102,7 @@ const UserQueue = ({
       });
 
       if (response.status === 401 || response.status === 403) {
-        notify(
-          "برای استفاده از این قابلیت باید وارد حساب کاربری شوید.",
-          ToastType.error
-        );
+        notify("برای استفاده از این قابلیت باید وارد حساب کاربری شوید.", ToastType.error);
         router.push("/logout");
         return;
       }
@@ -139,10 +130,7 @@ const UserQueue = ({
       });
 
       if (response.status === 401) {
-        notify(
-          "برای استفاده از این قابلیت باید وارد حساب کاربری شوید.",
-          ToastType.error
-        );
+        notify("برای استفاده از این قابلیت باید وارد حساب کاربری شوید.", ToastType.error);
         router.push("/logout");
         return;
       }
@@ -405,26 +393,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } catch (error: any) {
     // بررسی اینکه آیا پاسخ از سمت سرور وجود دارد
     if (error.response) {
-      // if (error.response.status === 403) {
-      //   redirect("/logout");
-      // }
+      if (error.response.status === 403) {
+        redirect("/logout");
+      }
       console.error(
         "api/getQueuePosition Server responded with an error:",
         error.response.data
       );
 
-      initialLength = error.response.data.error.queueLength
-        ? error.response.data.error.queueLength
-        : null;
+      initialLength = error.response.data.error.queueLength;
     }
-    return {
-      props: {
-        initialPosition, // ارسال مقدار position به کامپوننت
-        initialLength,
-        initialVideoToken,
-        initialRoomUrl,
-      },
-    };
   }
 
   return {
