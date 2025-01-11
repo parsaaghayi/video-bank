@@ -7,7 +7,7 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex justify-center" style={{ direction: "rtl" }}>
-      <main className="w-[400px] max-w-[100dvw] bg-[#f8f8f8] h-[100dvh]">
+      <main className="w-[400px] max-w-[100dvw] bg-[#f8f8f8]" style={{ height: "100dvh" }}>
         {children}
       </main>
     </div>

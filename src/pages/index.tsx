@@ -28,7 +28,7 @@ const Home = () => {
   }, [router]);
 
   return (
-    <div className="flex flex-col gap-10 justify-center items-center h-screen bg-purple-600">
+    <div className="flex flex-col gap-10 justify-center items-center h-[100dvh] bg-purple-600">
       <Image
         src={"/images/logo.svg"}
         alt="profile"

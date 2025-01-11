@@ -230,7 +230,7 @@ const UserQueue = ({
   };
 
   return (
-    <div className="w-full h-[100vh] flex flex-col justify-between">
+    <div className="w-full  h-[100dvh] flex flex-col justify-between">
       <div className="topbar flex justify-between items-center m-2">
         <div className="p-2 w-[40px] h-[40px] rounded-2xl bg-white">
           <Image
